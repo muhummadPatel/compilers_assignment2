@@ -1,0 +1,17 @@
+; ModuleID = "ula"
+target triple = "unknown-unknown-unknown"
+target datalayout = ""
+
+
+define float @"main"() 
+{
+entry:
+  %".2" = alloca float
+  %".3" = fadd float 0x3ff0000000000000, 0x4000000000000000
+  store float %".3", float* %".2"
+  %".5" = load float* %".2"
+  ret float %".5"
+}
+
+
+
