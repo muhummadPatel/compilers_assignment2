@@ -49,6 +49,13 @@ def sanitize_tree(tupletree, depth=0):
     return lst
 
 
+def is_float(n):
+    try:
+        float(n)
+        return True
+    except ValueError:
+        return False
+
 flttyp = ir.FloatType() # create float type
 fnctyp = ir.FunctionType(flttyp, ()) # create function type to return a float
 module = ir.Module(name="ula") # create module named "ula"
@@ -76,9 +83,22 @@ def code_gen(tree): # traverse tree recursively to generate code
         return(builder.fmul(code_gen(tree[1]),code_gen(tree[2])))
     elif tree[0] == "/":
         return(builder.fdiv(code_gen(tree[1]),code_gen(tree[2])))
-    elif tree[0].isnumeric():
+    elif tree[0] == "Load":
+        var = tree[1][0]
+        return(builder.load(var_dict[var]))
+    elif tree[0].isnumeric() or is_float(tree[0]):
         return(ir.Constant(ir.FloatType(), float(tree[0])))
 
+
+def gen_ir(code):
+    syntree = parser.parse(code)
+            
+    tree = sanitize_tree(syntree)
+    tree = tree[1]
+    
+    
+    code_gen(tree) # call code_gen() to traverse tree & generate code
+    builder.ret(builder.load(var_dict[last_var])) #specify return value
 
 
 infilename = ""
@@ -89,22 +109,15 @@ def main():
         infilename = sys.argv[1]
         if os.path.isfile(infilename):
             infile = open(infilename, "r")
+            code = infile.read()
             
-            outfilename = os.path.splitext(infilename)[0] + ".err"
-            sys.stdout = open(outfilename, "w")
-            syntree = parser.parse(infile.read())
-            sys.stdout = sys.__stdout__
+            gen_ir(code)
             
-            tree = sanitize_tree(syntree)
-            tree = tree[1]
-            
-            print(tree)
-            
-            code_gen(tree) # call code_gen() to traverse tree & generate code
-            builder.ret(builder.load(var_dict[last_var])) #specify return value
+            outfilename = os.path.splitext(infilename)[0] + ".ir"
+            outfile = open(outfilename, "w")
+            print(module, file=outfile)
             print(module)
-            print(var_dict)
-
+            outfile.close()
         else:
             print("Invalid file.")
     else:
