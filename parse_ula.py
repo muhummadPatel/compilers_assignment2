@@ -28,7 +28,7 @@ def p_statements(p):
 
 def p_statement(p):
     """Statement : ID '=' expression"""
-    p[0] = ("AssignStatement", ["ID," + p[1], p[3]])
+    p[0] = ("AssignStatement", ["ID," + p[1] + "," + str(p.lineno(1)), p[3]])
 
 
 def p_expression_plus(p):
@@ -73,7 +73,7 @@ def p_factor_float(p):
 
 def p_factor_id(p):
     """factor : ID"""
-    p[0] = ("IdentifierExpression", ["ID," + p[1]])
+    p[0] = ("IdentifierExpression", ["ID," + p[1] + "," + str(p.lineno(1))])
 
 
 def p_error(p):
@@ -81,10 +81,9 @@ def p_error(p):
     
     print("parse error on line %d" % p.lexer.lineno)
     
-    if __name__ == "__main__":
-        outfilename = os.path.splitext(infilename)[0]+".err"
-        with open(outfilename, "w") as outfile:
-            print("parse error on line %d" % p.lexer.lineno, file=outfile)
+    outfilename = os.path.splitext(infilename)[0]+".err"
+    with open(outfilename, "w") as outfile:
+        print("parse error on line %d" % p.lexer.lineno, file=outfile)
             
     exit()
 

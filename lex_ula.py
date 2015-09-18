@@ -30,10 +30,9 @@ def t_error(t):
     
     print("lexical error on line %d" % t.lexer.lineno)
     
-    if __name__ == "__main__":
-        outfilename = os.path.splitext(infilename)[0]+".err"
-        with open(outfilename, "w") as outfile:
-            print("lexical error on line %d" % t.lexer.lineno, file=outfile)
+    outfilename = os.path.splitext(infilename)[0]+".err"
+    with open(outfilename, "w") as outfile:
+        print("lexical error on line %d" % t.lexer.lineno, file=outfile)
             
     exit()
         
